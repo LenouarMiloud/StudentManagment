@@ -25,10 +25,14 @@ class SchoolViewModel(application: Application) : AndroidViewModel(application) 
         val clazz = className.value.trim()
 
         if (name.isNotEmpty() && clazz.isNotEmpty()) {
-            viewModelScope.launch {
-                dao.insertStudent(Student(name = name, className = clazz))
-                // تفريغ حقل اسم التلميذ بعد الإضافة لتسهيل إضافة تلميذ آخر لنفس القسم
-                studentName.value = ""
+            viewModelScope.launch { // ⬅️ ضروري جداً لكي يتم الإدخال في قاعدة البيانات
+                try {
+                    dao.insertStudent(Student(name = name, className = clazz))
+                    // تفريغ حقل الاسم فقط، ونترك اسم القسم لكي يسهل إضافة تلميذ آخر لنفس القسم
+                    studentName.value = ""
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
         }
     }
